@@ -10,11 +10,18 @@
 namespace {
 G4bool gSaveAllSecondaryTruthTrees = true;
 G4UIcmdWithABool* gSaveAllSecondaryTruthTreesCommand = nullptr;
+G4bool gSaveAllSecondaryPhotonsTree = true;
+G4UIcmdWithABool* gSaveAllSecondaryPhotonsTreeCommand = nullptr;
 }
 
 G4bool WCSimSaveAllSecondaryTruthTrees()
 {
   return gSaveAllSecondaryTruthTrees;
+}
+
+G4bool WCSimSaveAllSecondaryPhotonsTree()
+{
+  return gSaveAllSecondaryTruthTrees && gSaveAllSecondaryPhotonsTree;
 }
 
 WCSimRunActionMessenger::WCSimRunActionMessenger(WCSimRunAction* WCSimRA)
@@ -58,6 +65,15 @@ WCSimRunActionMessenger::WCSimRunActionMessenger(WCSimRunAction* WCSimRA)
       "SaveAllSecondaryTruthTrees", false);
   gSaveAllSecondaryTruthTreesCommand->SetDefaultValue(true);
   gSaveAllSecondaryTruthTreesCommand->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  gSaveAllSecondaryPhotonsTreeCommand = new G4UIcmdWithABool(
+      "/WCSimIO/SaveAllSecondaryPhotonsTree", this);
+  gSaveAllSecondaryPhotonsTreeCommand->SetGuidance(
+      "Create and fill the AllSecondaryPhotons truth TTree (AllSecondaries is unaffected).");
+  gSaveAllSecondaryPhotonsTreeCommand->SetParameterName(
+      "SaveAllSecondaryPhotonsTree", false);
+  gSaveAllSecondaryPhotonsTreeCommand->SetDefaultValue(true);
+  gSaveAllSecondaryPhotonsTreeCommand->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 WCSimRunActionMessenger::~WCSimRunActionMessenger()
@@ -69,6 +85,8 @@ WCSimRunActionMessenger::~WCSimRunActionMessenger()
   delete UseTimer;
   delete gSaveAllSecondaryTruthTreesCommand;
   gSaveAllSecondaryTruthTreesCommand = nullptr;
+  delete gSaveAllSecondaryPhotonsTreeCommand;
+  gSaveAllSecondaryPhotonsTreeCommand = nullptr;
   delete WCSimIODir;
 }
 
@@ -81,6 +99,16 @@ void WCSimRunActionMessenger::SetNewValue(G4UIcommand* command,G4String newValue
           gSaveAllSecondaryTruthTreesCommand->GetNewBoolValue(newValue);
       G4cout << "AllSecondaries/AllSecondaryPhotons truth TTrees "
              << (gSaveAllSecondaryTruthTrees ? "ENABLED" : "DISABLED")
+             << G4endl;
+      return;
+    }
+
+  if (command == gSaveAllSecondaryPhotonsTreeCommand)
+    {
+      gSaveAllSecondaryPhotonsTree =
+          gSaveAllSecondaryPhotonsTreeCommand->GetNewBoolValue(newValue);
+      G4cout << "AllSecondaryPhotons truth TTree "
+             << (gSaveAllSecondaryPhotonsTree ? "ENABLED" : "DISABLED")
              << G4endl;
       return;
     }
