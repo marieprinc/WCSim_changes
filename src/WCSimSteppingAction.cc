@@ -28,6 +28,7 @@
 #include <unordered_map>
 
 G4bool WCSimSaveAllSecondaryTruthTrees();
+G4bool WCSimSaveAllSecondaryPhotonsTree();
 
 int WCSimSteppingAction::primaryMuonTrackID = -1;
 int WCSimSteppingAction::primaryMuonEventID = -1;
@@ -416,16 +417,17 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
   }
 
   const G4bool saveTruth = WCSimSaveAllSecondaryTruthTrees();
+  const G4bool savePhotons = WCSimSaveAllSecondaryPhotonsTree();
   if (saveTruth) {
     const int eventID = event->GetEventID();
-    if (eventID != gAllSecondaryPhotonEvent) {
+    if (savePhotons && eventID != gAllSecondaryPhotonEvent) {
       gAllSecondaryPhotonEvent = eventID;
       gAllSecondaryPhotonBirth.clear();
       AllSecondaryPhotonsTree_ResetEvent(eventID);
     }
 
     FillAllSecondaries(aStep, event);
-    CacheNewSecondaryPhotons(aStep, eventID);
+    if (savePhotons) CacheNewSecondaryPhotons(aStep, eventID);
   }
 
   G4StepPoint* prePoint = aStep->GetPreStepPoint();
@@ -435,7 +437,7 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 
   if (!isOptical) return;
 
-  if (saveTruth) {
+  if (savePhotons) {
     UpdateAndFinalizeSecondaryPhoton(aStep, preVolume, postVolume);
   }
 
