@@ -20,7 +20,7 @@
 
 #include <string>
 
-G4bool WCSimSaveAllSecondaryTruthTrees();
+G4bool WCSimSaveAllSecondaryPhotonsTree();
 
 namespace {
 int JRSecondaryPhotonPMTIDFromStep(const G4Step* step)
@@ -62,7 +62,7 @@ void JRNoteAllSecondaryPhotonPE(G4Step* aStep,
                                 G4double hitTime,
                                 G4double photonEndEnergy)
 {
-  if (!WCSimSaveAllSecondaryTruthTrees() || !aStep) return;
+  if (!WCSimSaveAllSecondaryPhotonsTree() || !aStep) return;
 
   G4Track* trk = aStep->GetTrack();
   if (!trk) return;
