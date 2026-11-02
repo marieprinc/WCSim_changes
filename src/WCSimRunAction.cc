@@ -26,6 +26,7 @@
 #include "WCSimAllSecondaryPhotonsTree.hh"
 
 G4bool WCSimSaveAllSecondaryTruthTrees();
+G4bool WCSimSaveAllSecondaryPhotonsTree();
 
 int pawc_[500000];                // Declare the PAWC common
 struct ntupleStruct jhfNtuple;    // global, ToDo: why not use and set the class member?
@@ -121,7 +122,7 @@ void WCSimRunAction::BeginOfRunAction(const G4Run* aRun)
       hfile->SetCompressionLevel(2);
       if (WCSimSaveAllSecondaryTruthTrees()) {
         AllSecondariesTree_Book(hfile);
-        AllSecondaryPhotonsTree_Book(hfile);
+        if (WCSimSaveAllSecondaryPhotonsTree()) AllSecondaryPhotonsTree_Book(hfile);
       }
 
       if (wcsimdetector->GetIsNuPrism()) {
@@ -517,7 +518,7 @@ void WCSimRunAction::EndOfRunAction(const G4Run*)
   
   if (WCSimSaveAllSecondaryTruthTrees()) {
     AllSecondariesTree_Write();
-    AllSecondaryPhotonsTree_Write();
+    if (WCSimSaveAllSecondaryPhotonsTree()) AllSecondaryPhotonsTree_Write();
   }
 
   // Close the Root file at the end of the run
